@@ -1,0 +1,47 @@
+export enum Rank {
+	TWO,
+	THREE,
+	FOUR,
+	FIVE,
+	SIX,
+	SEVEN,
+	EIGHT,
+	NINE,
+	TEN,
+	JACK,
+	QUEEN,
+	KING,
+	ACE,
+}
+
+export const RankValues = [
+	Rank.TWO,
+	Rank.THREE,
+	Rank.FOUR,
+	Rank.FIVE,
+	Rank.SIX,
+	Rank.SEVEN,
+	Rank.EIGHT,
+	Rank.NINE,
+	Rank.TEN,
+	Rank.JACK,
+	Rank.QUEEN,
+	Rank.KING,
+	Rank.ACE,
+]
+
+export const RankNames = [
+	`2`,
+	`3`,
+	`4`,
+	`5`,
+	`6`,
+	`7`,
+	`8`,
+	`9`,
+	`10`,
+	`J`,
+	`Q`,
+	`K`,
+	`A`,
+]
