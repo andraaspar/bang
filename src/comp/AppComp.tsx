@@ -4,6 +4,7 @@ import { Route } from '../model/routing'
 import { GamePage } from './page/GamePage'
 import { MainMenuPage } from './page/MainMenuPage'
 import { SetupPage } from './page/SetupPage'
+import { UnknownPage } from './page/UnknownPage'
 import { WelcomePage } from './page/WelcomePage'
 
 export interface AppCompProps {}
@@ -24,7 +25,7 @@ export function AppComp(props: AppCompProps) {
 				<WelcomePage />
 			</RouteComp>
 			<RouteComp path='*'>
-				<div>Eltévedtem... :(</div>
+				<UnknownPage />
 			</RouteComp>
 		</Switch>
 	)

@@ -7,6 +7,7 @@ export interface IPlayer {
 	name: string
 	cardsInHand: Card[]
 	cardsPlayed: Card[]
+	cardsPlayedThisRound: Card[]
 	health: number
 	character: Character | null
 	role: Role | null
@@ -22,6 +23,7 @@ export function makePlayer(o: { name: string; ai?: boolean }): IPlayer {
 		health: 0,
 		cardsInHand: [],
 		cardsPlayed: [],
+		cardsPlayedThisRound: [],
 		dynamiteResolution: null,
 		ai: o.ai ?? false,
 	}
