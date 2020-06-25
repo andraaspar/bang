@@ -1,22 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Redirect, useHistory } from 'react-router-dom'
-import {
-	IOutcome,
-	IPlayUiRender,
-	IPlayUiRenderArguments,
-	play,
-} from '../../fun/play'
+import { IPlayUiRender, IPlayUiRenderExtra, play } from '../../fun/play'
+import { IAction } from '../../model/IAction'
+import { IResolveAction } from '../../model/IResolveAction'
 import { makeRouteWelcome } from '../../model/routing'
 import { AppStore } from '../../store/AppStore'
+import { DeadComp } from '../gamepage/DeadComp'
+import { DrinkABeerComp } from '../gamepage/DrinkABeerComp'
 import { DynamiteDoesNotExplodeComp } from '../gamepage/DynamiteDoesNotExplodeComp'
 import { DynamiteExplodesComp } from '../gamepage/DynamiteExplodesComp'
 import { GameOverComp } from '../gamepage/GameOverComp'
 import { NextPlayerGetsTheDynamiteComp } from '../gamepage/NextPlayerGetsTheDynamiteComp'
 import { PlayerIsUp } from '../gamepage/PlayerIsUpComp'
 import { ShowDynamiteComp } from '../gamepage/ShowDynamiteComp'
-import { YouDrinkABeerComp } from '../gamepage/YouDrinkABeerComp'
-import { YoureDeadComp } from '../gamepage/YoureDeadComp'
-import { YouSurvivedComp } from '../gamepage/YouSurvivedComp'
+import { SurvivedComp } from '../gamepage/SurvivedComp'
 
 export interface GamePageProps {}
 
@@ -26,56 +23,71 @@ enum Page {
 	PLAYER_IS_UP,
 	SHOW_DYNAMITE,
 	DYNAMITE_EXPLODES,
-	YOU_DRINK_A_BEER,
-	YOU_SURVIVED,
-	YOURE_DEAD,
+	DRINK_A_BEER,
+	SURVIVED,
+	DEAD,
 	DYNAMITE_DOES_NOT_EXPLODE,
 	NEXT_PLAYER_GETS_THE_DYNAMITE,
+	CAN_DRAW,
+	CARD_DRAWN,
+	SELECT_ACTION,
+	SELECT_BANG_TARGET,
+}
+
+interface IData extends IPlayUiRenderExtra {
+	page?: Page
+	resolve?: IResolveAction
 }
 
 export function GamePage(props: GamePageProps) {
 	const history = useHistory()
 	const game = AppStore.useState((s) => s.game)
-	const [$page, set$page] = useState(Page.LOADING)
-	const [$outcome, set$outcome] = useState<IOutcome | null>(null)
-	const playResolve = useRef<(() => void) | null>(null)
+	const [$initialGame] = useState(game)
+	const dataRef = useRef<IData>({
+		page: Page.LOADING,
+	})
 	useEffect(() => {
 		let isAborted = false
+
 		function handleRender(page: Page): IPlayUiRender {
-			return ({ game }: IPlayUiRenderArguments) =>
-				new Promise<void>((resolve, reject) => {
+			return (game, extra) =>
+				new Promise<IAction | undefined>((resolve, reject) => {
 					if (isAborted) return
-					set$page(page)
+					dataRef.current = { ...extra, page, resolve }
 					AppStore.update((s) => {
 						s.game = JSON.parse(JSON.stringify(game))
 					})
-					playResolve.current = resolve
 				})
 		}
+
 		;(async () => {
-			if (game) {
+			if ($initialGame) {
 				try {
 					const outcome = await play({
-						game: JSON.parse(JSON.stringify(game)),
+						game: JSON.parse(JSON.stringify($initialGame)),
 						ui: {
 							showPlayerIsUp: handleRender(Page.PLAYER_IS_UP),
 							showDynamite: handleRender(Page.SHOW_DYNAMITE),
 							showDynamiteExplodes: handleRender(Page.DYNAMITE_EXPLODES),
-							showYouDrinkABeer: handleRender(Page.YOU_DRINK_A_BEER),
-							showYouSurvived: handleRender(Page.YOU_SURVIVED),
-							showYoureDead: handleRender(Page.YOURE_DEAD),
+							showDrinkABeer: handleRender(Page.DRINK_A_BEER),
+							showSurvived: handleRender(Page.SURVIVED),
+							showDead: handleRender(Page.DEAD),
 							showDynamiteDoesNotExplode: handleRender(
 								Page.DYNAMITE_DOES_NOT_EXPLODE,
 							),
 							showNextPlayerGetsTheDynamite: handleRender(
 								Page.NEXT_PLAYER_GETS_THE_DYNAMITE,
 							),
+							showCanDraw: handleRender(Page.CAN_DRAW),
+							showCardDrawn: handleRender(Page.CARD_DRAWN),
+							selectAction: handleRender(Page.SELECT_ACTION),
+							selectBangTarget: handleRender(Page.SELECT_BANG_TARGET),
 						},
 					})
 					if (!isAborted) {
-						set$page(Page.GAME_OVER)
-						set$outcome(outcome)
-						playResolve.current = () => {
+						dataRef.current.page = Page.GAME_OVER
+						dataRef.current.outcome = outcome
+						dataRef.current.resolve = () => {
 							history.push(makeRouteWelcome())
 						}
 					}
@@ -87,48 +99,65 @@ export function GamePage(props: GamePageProps) {
 		return () => {
 			isAborted = true
 		}
-	}, [game, history])
+	}, [$initialGame, history])
 	if (game == null) {
 		return <Redirect to={makeRouteWelcome()} />
 	}
 	const playerIndex = game.playerIndex
 	const player = game.players[playerIndex]
 	const nextPlayer = game.players[(playerIndex + 1) % game.players.length]
-	switch ($page) {
+	switch (dataRef.current.page) {
 		case Page.GAME_OVER:
 			return (
-				<GameOverComp _outcome={$outcome!} _resolve={playResolve.current!} />
+				<GameOverComp
+					_outcome={dataRef.current.outcome!}
+					_resolve={dataRef.current.resolve!}
+				/>
 			)
 		case Page.PLAYER_IS_UP:
-			return <PlayerIsUp _player={player} _resolve={playResolve.current!} />
+			return <PlayerIsUp _player={player} _resolve={dataRef.current.resolve!} />
 		case Page.SHOW_DYNAMITE:
 			return (
 				<ShowDynamiteComp
-					_color={player.dynamiteResolution!.color}
-					_rank={player.dynamiteResolution!.rank}
-					_resolve={playResolve.current!}
+					_color={dataRef.current.cardColor!}
+					_rank={dataRef.current.cardRank!}
+					_resolve={dataRef.current.resolve!}
 				/>
 			)
 		case Page.DYNAMITE_EXPLODES:
-			return <DynamiteExplodesComp _resolve={playResolve.current!} />
-		case Page.YOU_DRINK_A_BEER:
+			return <DynamiteExplodesComp _resolve={dataRef.current.resolve!} />
+		case Page.DRINK_A_BEER:
 			return (
-				<YouDrinkABeerComp
-					_resolve={playResolve.current!}
-					_count={player.dynamiteResolution!.beersDrunk + 1}
+				<DrinkABeerComp
+					_you={dataRef.current.targetPlayerIndex === game.playerIndex}
+					_player={game.players[dataRef.current.targetPlayerIndex!]}
+					_count={dataRef.current.beersDrunk! + 1}
+					_resolve={dataRef.current.resolve!}
 				/>
 			)
-		case Page.YOU_SURVIVED:
-			return <YouSurvivedComp _resolve={playResolve.current!} />
-		case Page.YOURE_DEAD:
-			return <YoureDeadComp _resolve={playResolve.current!} />
+		case Page.SURVIVED:
+			return (
+				<SurvivedComp
+					_you={dataRef.current.targetPlayerIndex === game.playerIndex}
+					_player={game.players[dataRef.current.targetPlayerIndex!]}
+					_resolve={dataRef.current.resolve!}
+				/>
+			)
+		case Page.DEAD:
+			return (
+				<DeadComp
+					_you={dataRef.current.targetPlayerIndex === game.playerIndex}
+					_player={game.players[dataRef.current.targetPlayerIndex!]}
+					_resolve={dataRef.current.resolve!}
+				/>
+			)
 		case Page.DYNAMITE_DOES_NOT_EXPLODE:
-			return <DynamiteDoesNotExplodeComp _resolve={playResolve.current!} />
+			return <DynamiteDoesNotExplodeComp _resolve={dataRef.current.resolve!} />
 		case Page.NEXT_PLAYER_GETS_THE_DYNAMITE:
 			return (
 				<NextPlayerGetsTheDynamiteComp
 					_nextPlayer={nextPlayer}
-					_resolve={playResolve.current!}
+					_resolve={dataRef.current.resolve!}
 				/>
 			)
 	}

@@ -2,11 +2,12 @@ import React from 'react'
 import { getRoleName } from '../../fun/getRoleName'
 import { joinList } from '../../fun/joinList'
 import { IOutcome } from '../../fun/play'
+import { IResolveAction } from '../../model/IResolveAction'
 import { centeredCss } from '../../style/centeredCss'
 
 export interface GameOverCompProps {
 	_outcome: IOutcome
-	_resolve: () => void
+	_resolve: IResolveAction
 }
 
 export function GameOverComp(props: GameOverCompProps) {
@@ -41,7 +42,7 @@ export function GameOverComp(props: GameOverCompProps) {
 				</>
 			)}
 			<div className={centeredCss}>
-				<button onClick={props._resolve}>Jól van</button>
+				<button onClick={() => props._resolve()}>Jól van</button>
 			</div>
 		</>
 	)

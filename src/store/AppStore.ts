@@ -9,9 +9,9 @@ export const AppStore = new Store<IAppStore>({
 	game: JSON.parse(localStorage.getItem('AutoSave') ?? 'null') as IGame | null,
 })
 
-AppStore.subscribe(
-	(s) => s.game,
-	(game) => {
-		localStorage.setItem('AutoSave', JSON.stringify(game))
-	},
-)
+// AppStore.subscribe(
+// 	(s) => s.game,
+// 	(game) => {
+// 		localStorage.setItem('AutoSave', JSON.stringify(game))
+// 	},
+// )

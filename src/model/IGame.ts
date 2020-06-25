@@ -4,7 +4,6 @@ import { Card } from './Card'
 import { IPlayer, makePlayer } from './IPlayer'
 
 export interface IGame {
-	round: number
 	playerIndex: number
 	players: IPlayer[]
 	deck: Card[]
@@ -13,7 +12,6 @@ export interface IGame {
 
 export function makeGame(): IGame {
 	return {
-		round: 0,
 		playerIndex: 0,
 		deck: DECK.slice(),
 		pile: [],
