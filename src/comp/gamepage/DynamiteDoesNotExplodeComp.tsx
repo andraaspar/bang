@@ -1,9 +1,9 @@
 import React from 'react'
-import { IResolveAction } from '../../model/IResolveAction'
+import { IResolve } from '../../model/IResolve'
 import { centeredCss } from '../../style/centeredCss'
 
 export interface DynamiteDoesNotExplodeCompProps {
-	_resolve: IResolveAction
+	_resolve: IResolve
 }
 
 export function DynamiteDoesNotExplodeComp(

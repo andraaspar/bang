@@ -11,15 +11,16 @@ export async function handleDrawCards(
 		count: number
 	},
 ) {
-	const player = ctxt.game.players[playerIndex]
+	const { game, ui } = ctxt
+	const player = game.players[playerIndex]
 	for (let cardIndex = 0; cardIndex < count; cardIndex++) {
-		if (ctxt.game.deck.length === 0) {
-			if (ctxt.game.pile.length === 0) {
+		if (game.deck.length === 0) {
+			if (game.pile.length === 0) {
 				throw new Error(`[qcfmu7] Kifogytam a lapokból!`)
 			}
-			ctxt.game.deck.push(...ctxt.game.pile.splice(0, ctxt.game.pile.length))
+			game.deck.push(...game.pile.splice(0, game.pile.length))
 		}
-		player.cardsInHand.push(draw(ctxt.game.deck))
-		await ctxt.ui.showCardDrawn(ctxt.game)
+		player.cardsInHand.push(draw(game.deck))
+		await ui.showCardDrawn({ game })
 	}
 }

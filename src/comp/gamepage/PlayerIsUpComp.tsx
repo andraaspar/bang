@@ -2,12 +2,12 @@ import React from 'react'
 import { IPlayer } from '../../model/IPlayer'
 import { centeredCss } from '../../style/centeredCss'
 
-export interface PlayerIsUpProps {
+export interface PlayerIsUpCompProps {
 	_player: IPlayer
 	_resolve: () => void
 }
 
-export function PlayerIsUp(props: PlayerIsUpProps) {
+export function PlayerIsUpComp(props: PlayerIsUpCompProps) {
 	return (
 		<>
 			<div className={centeredCss}>{props._player.name}</div>

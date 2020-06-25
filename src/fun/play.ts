@@ -1,5 +1,4 @@
 import { Color } from '../model/Color'
-import { IAction } from '../model/IAction'
 import { IGame } from '../model/IGame'
 import { IPlayer } from '../model/IPlayer'
 import { Rank } from '../model/Rank'
@@ -11,31 +10,49 @@ export interface IPlayArguments {
 	ui: IPlayUi
 }
 
-export interface IPlayUiRender {
-	(game: IGame, extra?: IPlayUiRenderExtra): Promise<IAction | undefined>
-}
-
-export interface IPlayUiRenderExtra {
-	outcome?: IOutcome
-	targetPlayerIndex?: number
-	cardColor?: Color
-	cardRank?: Rank
-	beersDrunk?: number
-}
-
 export interface IPlayUi {
-	showPlayerIsUp: IPlayUiRender
-	showDynamite: IPlayUiRender
-	showDynamiteExplodes: IPlayUiRender
-	showDrinkABeer: IPlayUiRender
-	showDead: IPlayUiRender
-	showSurvived: IPlayUiRender
-	showDynamiteDoesNotExplode: IPlayUiRender
-	showNextPlayerGetsTheDynamite: IPlayUiRender
-	showCanDraw: IPlayUiRender
-	showCardDrawn: IPlayUiRender
-	selectAction: IPlayUiRender
-	selectBangTarget: IPlayUiRender
+	showPlayerIsUp(arg: { game: IGame; player: IPlayer }): Promise<void>
+	showDynamite(arg: { game: IGame; color: Color; rank: Rank }): Promise<void>
+	showDynamiteExplodes(arg: { game: IGame }): Promise<void>
+	showDrinkABeer(arg: {
+		game: IGame
+		you: boolean
+		player: IPlayer
+		count: number
+	}): Promise<void>
+	showDead(arg: { game: IGame; you: boolean; player: IPlayer }): Promise<void>
+	showSurvived(arg: {
+		game: IGame
+		you: boolean
+		player: IPlayer
+	}): Promise<void>
+	showDynamiteDoesNotExplode(arg: { game: IGame }): Promise<void>
+	showNextPlayerGetsTheDynamite(arg: {
+		game: IGame
+		nextPlayer: IPlayer
+	}): Promise<void>
+	showCanDraw(arg: { game: IGame }): Promise<void>
+	showCardDrawn(arg: { game: IGame }): Promise<void>
+	selectAction(arg: { game: IGame }): Promise<IPlayCardOrUseCard | void>
+	selectBangTarget(arg: { game: IGame }): Promise<number>
+	showBarrel(arg: { game: IGame; targetPlayer: IPlayer }): Promise<void>
+	showBarrelSave(arg: { game: IGame; targetPlayer: IPlayer }): Promise<void>
+	showBarrelFail(arg: { game: IGame; targetPlayer: IPlayer }): Promise<void>
+	showTargetHasSavers(arg: {
+		game: IGame
+		targetPlayer: IPlayer
+	}): Promise<void>
+	selectSaveAction(arg: {
+		game: IGame
+		targetPlayer: IPlayer
+	}): Promise<IPlayCardOrUseCard | void>
+	showSaved(arg: { game: IGame }): Promise<void>
+	showTargetIsSaved(arg: { game: IGame; targetPlayer: IPlayer }): Promise<void>
+}
+
+export interface IPlayCardOrUseCard {
+	playCard?: { cardIndex: number }
+	useCard?: { cardIndex: number }
 }
 
 export interface IOutcome {

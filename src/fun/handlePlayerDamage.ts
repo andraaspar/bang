@@ -12,25 +12,31 @@ export async function handlePlayerDamage(
 		damage: number
 	},
 ) {
-	const player = ctxt.game.players[playerIndex]
+	const { game, ui } = ctxt
+	const player = game.players[playerIndex]
 	player.health -= damage
 	if (player.health < 1) {
 		let beersDrunk = 0
 		while (player.health < 1 && player.cardsInHand.includes(Card.BEER)) {
 			handleBeer(ctxt, {
+				player: player,
 				cardIndex: player.cardsInHand.indexOf(Card.BEER),
 				beersDrunk,
 			})
 			beersDrunk++
 		}
 		if (player.health < 1) {
-			await ctxt.ui.showDead(ctxt.game, {
-				targetPlayerIndex: playerIndex,
+			await ui.showDead({
+				game,
+				player,
+				you: playerIndex === game.playerIndex,
 			})
 			return
 		} else {
-			await ctxt.ui.showSurvived(ctxt.game, {
-				targetPlayerIndex: playerIndex,
+			await ui.showSurvived({
+				game,
+				player,
+				you: playerIndex === game.playerIndex,
 			})
 		}
 	}

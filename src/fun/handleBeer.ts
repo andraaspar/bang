@@ -1,16 +1,24 @@
 import { Card } from '../model/Card'
+import { IPlayer } from '../model/IPlayer'
 import { GameContext } from './play'
 import { putCardOnPile } from './putCardOnPile'
 
 export async function handleBeer(
 	ctxt: GameContext,
-	{ cardIndex, beersDrunk = 0 }: { cardIndex: number; beersDrunk?: number },
+	{
+		player,
+		cardIndex,
+		beersDrunk = 0,
+	}: { player: IPlayer; cardIndex: number; beersDrunk?: number },
 ) {
-	await ctxt.ui.showDrinkABeer(ctxt.game, {
-		targetPlayerIndex: ctxt.game.playerIndex,
-		beersDrunk,
+	const { game, ui } = ctxt
+	await ui.showDrinkABeer({
+		game,
+		player,
+		you: player === ctxt.player,
+		count: beersDrunk,
 	})
-	await putCardOnPile(ctxt, {
+	putCardOnPile(ctxt, {
 		cardIndex: ctxt.player.cardsInHand.indexOf(Card.BEER),
 		player: ctxt.player,
 	})

@@ -6,31 +6,33 @@ import { handleDynamite } from './handleDynamite'
 import { GameContext } from './play'
 
 export async function handleTurn(ctxt: GameContext) {
-	if (ctxt.player.health < 1) {
+	const { game, ui, player } = ctxt
+
+	if (player.health < 1) {
 		return
 	}
 
-	await ctxt.ui.showPlayerIsUp(ctxt.game)
+	await ui.showPlayerIsUp({ game, player })
 
 	await handleDynamite(ctxt)
-	if (ctxt.player.health < 1) {
+	if (player.health < 1) {
 		return
 	}
 
-	await ctxt.ui.showCanDraw(ctxt.game)
+	await ui.showCanDraw({ game })
 	await handleDrawCards(ctxt, {
-		playerIndex: ctxt.game.playerIndex,
+		playerIndex: game.playerIndex,
 		count: 2,
 	})
 
 	while (true) {
-		const action = await ctxt.ui.selectAction(ctxt.game)
+		const action = await ui.selectAction({ game })
 		if (action && action.playCard) {
 			const cardIndex = action.playCard.cardIndex
-			const card = ctxt.player.cardsInHand[cardIndex]
+			const card = player.cardsInHand[cardIndex]
 			switch (card) {
 				case Card.BEER:
-					await handleBeer(ctxt, { cardIndex })
+					await handleBeer(ctxt, { player, cardIndex })
 					break
 				case Card.BANG:
 					await handleBang(ctxt, { cardIndex })

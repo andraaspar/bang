@@ -2,12 +2,12 @@ import React from 'react'
 import { getRoleName } from '../../fun/getRoleName'
 import { joinList } from '../../fun/joinList'
 import { IOutcome } from '../../fun/play'
-import { IResolveAction } from '../../model/IResolveAction'
+import { IResolve } from '../../model/IResolve'
 import { centeredCss } from '../../style/centeredCss'
 
 export interface GameOverCompProps {
 	_outcome: IOutcome
-	_resolve: IResolveAction
+	_resolve: IResolve
 }
 
 export function GameOverComp(props: GameOverCompProps) {
