@@ -80,18 +80,18 @@ export class GameContext {
 	}
 }
 
-export async function play(p: IPlayArguments) {
+export async function play(p: IPlayArguments): Promise<IOutcome> {
 	const ctxt = new GameContext(p)
 	while (true) {
-		await handleTurn(ctxt)
-
 		const winners = ctxt.game.players.filter((player) => player.health >= 1)
 		if (winners.length <= 1) {
 			return { game: ctxt.game, winners }
 		}
+		autoSave(ctxt.game)
+
+		await handleTurn(ctxt)
 
 		ctxt.game.playerIndex =
 			(ctxt.game.playerIndex + 1) % ctxt.game.players.length
-		autoSave(ctxt.game)
 	}
 }
