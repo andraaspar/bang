@@ -12,5 +12,5 @@ export function putCardInPlay(
 	},
 ) {
 	const card = player.cardsInHand.splice(cardIndex, 1)[0]
-	player.cardsPlayed.push(card)
+	player.cardsInPlay.push(card)
 }

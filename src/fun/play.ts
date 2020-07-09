@@ -1,6 +1,9 @@
+import { Card } from '../model/Card'
 import { Color } from '../model/Color'
 import { IGame } from '../model/IGame'
 import { IPlayer } from '../model/IPlayer'
+import { IMessageBang } from '../model/message/IMessageBang'
+import { IMessageShowBarrel } from '../model/message/IMessageShowBarrel'
 import { Rank } from '../model/Rank'
 import { autoSave } from './autoSave'
 import { handleTurn } from './handleTurn'
@@ -31,23 +34,42 @@ export interface IPlayUi {
 		game: IGame
 		nextPlayer: IPlayer
 	}): Promise<void>
-	showCanDraw(arg: { game: IGame }): Promise<void>
-	showCardDrawn(arg: { game: IGame }): Promise<void>
-	selectAction(arg: { game: IGame }): Promise<IPlayCardOrUseCard | void>
-	selectBangTarget(arg: { game: IGame }): Promise<number>
-	showBarrel(arg: { game: IGame; targetPlayer: IPlayer }): Promise<void>
+	showCanDraw(arg: { game: IGame; count: number }): Promise<void>
+	showCardDrawn(arg: { game: IGame; card: Card }): Promise<void>
+	showCardsDrawn(arg: {
+		game: IGame
+		player: IPlayer
+		count: number
+	}): Promise<void>
+	selectAction(arg: {
+		game: IGame
+		cardsInHand: Card[]
+		cardsInPlay: Card[]
+	}): Promise<IPlayCardOrUseCard | void>
+	selectBangTarget(arg: {
+		game: IGame
+		targets: IPlayer[]
+	}): Promise<IPlayer | void>
+	showBarrel(arg: { game: IGame; message: IMessageShowBarrel }): Promise<void>
 	showBarrelSave(arg: { game: IGame; targetPlayer: IPlayer }): Promise<void>
-	showBarrelFail(arg: { game: IGame; targetPlayer: IPlayer }): Promise<void>
+	showBarrelFail(arg: {
+		game: IGame
+		targetPlayer: IPlayer
+		color: Color
+	}): Promise<void>
 	showTargetHasSavers(arg: {
 		game: IGame
 		targetPlayer: IPlayer
 	}): Promise<void>
 	selectSaveAction(arg: {
 		game: IGame
-		targetPlayer: IPlayer
+		player: IPlayer
+		cardsInHand: Card[]
+		cardsInPlay: Card[]
 	}): Promise<IPlayCardOrUseCard | void>
 	showSaved(arg: { game: IGame }): Promise<void>
 	showTargetIsSaved(arg: { game: IGame; targetPlayer: IPlayer }): Promise<void>
+	showBang(arg: { game: IGame; message: IMessageBang }): Promise<void>
 }
 
 export interface IPlayCardOrUseCard {
@@ -93,5 +115,8 @@ export async function play(p: IPlayArguments): Promise<IOutcome> {
 
 		ctxt.game.playerIndex =
 			(ctxt.game.playerIndex + 1) % ctxt.game.players.length
+		if (ctxt.game.playerIndex === 0) {
+			ctxt.game.round++
+		}
 	}
 }

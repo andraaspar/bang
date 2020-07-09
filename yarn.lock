@@ -6702,6 +6702,11 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
+magyar-rag@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/magyar-rag/-/magyar-rag-1.0.0.tgz#f6deb7133a55b12367dc698fb3b30de07dc931b1"
+  integrity sha512-MBM/zBt8fsTsAsIgaeni1CYj8a9lbyYFQVV7gCE5v+i3CRhScFIKvkYrtJsEsRCELFTq3iChSQY/rbcws/lxsg==
+
 make-dir@^2.0.0, make-dir@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-2.1.0.tgz#5f0310e18b8be898cc07009295a30ae41e91e6f5"

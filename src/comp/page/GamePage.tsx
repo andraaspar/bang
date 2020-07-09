@@ -4,6 +4,11 @@ import { play } from '../../fun/play'
 import { IGame } from '../../model/IGame'
 import { makeRouteWelcome } from '../../model/routing'
 import { AppStore } from '../../store/AppStore'
+import { BarrelFailsComp } from '../gamepage/BarrelFailsComp'
+import { BarrelSavesComp } from '../gamepage/BarrelSavesComp'
+import { CanDrawComp } from '../gamepage/CanDrawComp'
+import { CardComp } from '../gamepage/CardComp'
+import { CardsDrawnComp } from '../gamepage/CardsDrawnComp'
 import { DeadComp } from '../gamepage/DeadComp'
 import { DrinkABeerComp } from '../gamepage/DrinkABeerComp'
 import { DynamiteDoesNotExplodeComp } from '../gamepage/DynamiteDoesNotExplodeComp'
@@ -11,8 +16,15 @@ import { DynamiteExplodesComp } from '../gamepage/DynamiteExplodesComp'
 import { GameOverComp } from '../gamepage/GameOverComp'
 import { NextPlayerGetsTheDynamiteComp } from '../gamepage/NextPlayerGetsTheDynamiteComp'
 import { PlayerIsUpComp } from '../gamepage/PlayerIsUpComp'
+import { SavedComp } from '../gamepage/SavedComp'
+import { SelectActionComp } from '../gamepage/SelectActionComp'
+import { SelectBangTargetComp } from '../gamepage/SelectBangTargetComp'
+import { SelectSaveActionComp } from '../gamepage/SelectSaveActionComp'
+import { ShowBangComp } from '../gamepage/ShowBangComp'
+import { ShowBarrelComp } from '../gamepage/ShowBarrelComp'
 import { ShowDynamiteComp } from '../gamepage/ShowDynamiteComp'
 import { SurvivedComp } from '../gamepage/SurvivedComp'
+import { TargetHasSaversComp } from '../gamepage/TargetHasSaversComp'
 
 export interface GamePageProps {}
 
@@ -112,59 +124,117 @@ export function GamePage(props: GamePageProps) {
 									))
 								})
 							},
-							showCanDraw({ game }) {
+							showCanDraw({ game, count }) {
 								return new Promise((resolve, reject) => {
-									setRenderer(game, () => <>?</>)
+									setRenderer(game, () => (
+										<CanDrawComp _count={count} _resolve={resolve} />
+									))
 								})
 							},
-							showCardDrawn({ game }) {
+							showCardDrawn({ game, card }) {
 								return new Promise((resolve, reject) => {
-									setRenderer(game, () => <>?</>)
+									setRenderer(game, () => (
+										<CardComp _card={card} _resolve={resolve} />
+									))
 								})
 							},
-							selectAction({ game }) {
+							showCardsDrawn({ game, player, count }) {
 								return new Promise((resolve, reject) => {
-									setRenderer(game, () => <>?</>)
+									setRenderer(game, () => (
+										<CardsDrawnComp
+											_player={player}
+											_count={count}
+											_resolve={resolve}
+										/>
+									))
 								})
 							},
-							selectBangTarget({ game }) {
+							selectAction({ game, cardsInHand, cardsInPlay }) {
 								return new Promise((resolve, reject) => {
-									setRenderer(game, () => <>?</>)
+									setRenderer(game, () => (
+										<SelectActionComp
+											_cardsInHand={cardsInHand}
+											_cardsInPlay={cardsInPlay}
+											_resolve={resolve}
+										/>
+									))
 								})
 							},
-							showBarrel({ game }) {
+							selectBangTarget({ game, targets }) {
 								return new Promise((resolve, reject) => {
-									setRenderer(game, () => <>?</>)
+									setRenderer(game, () => (
+										<SelectBangTargetComp
+											_targets={targets}
+											_resolve={resolve}
+										/>
+									))
 								})
 							},
-							showBarrelFail({ game }) {
+							showBarrel({ game, message }) {
 								return new Promise((resolve, reject) => {
-									setRenderer(game, () => <>?</>)
+									setRenderer(game, () => (
+										<ShowBarrelComp _message={message} _resolve={resolve} />
+									))
 								})
 							},
-							showBarrelSave({ game }) {
+							showBarrelFail({ game, targetPlayer, color }) {
 								return new Promise((resolve, reject) => {
-									setRenderer(game, () => <>?</>)
+									setRenderer(game, () => (
+										<BarrelFailsComp
+											_targetPlayer={targetPlayer}
+											_color={color}
+											_resolve={resolve}
+										/>
+									))
 								})
 							},
-							showTargetHasSavers({ game }) {
+							showBarrelSave({ game, targetPlayer }) {
 								return new Promise((resolve, reject) => {
-									setRenderer(game, () => <>?</>)
+									setRenderer(game, () => (
+										<BarrelSavesComp
+											_targetPlayer={targetPlayer}
+											_resolve={resolve}
+										/>
+									))
 								})
 							},
-							selectSaveAction({ game }) {
+							showTargetHasSavers({ game, targetPlayer }) {
 								return new Promise((resolve, reject) => {
-									setRenderer(game, () => <>?</>)
+									setRenderer(game, () => (
+										<TargetHasSaversComp
+											_resolve={resolve}
+											_targetPlayer={targetPlayer}
+										/>
+									))
+								})
+							},
+							selectSaveAction({ game, cardsInHand, cardsInPlay, player }) {
+								return new Promise((resolve, reject) => {
+									setRenderer(game, () => (
+										<SelectSaveActionComp
+											_cardsInHand={cardsInHand}
+											_cardsInPlay={cardsInPlay}
+											_player={player}
+											_resolve={resolve}
+										/>
+									))
 								})
 							},
 							showSaved({ game }) {
 								return new Promise((resolve, reject) => {
+									setRenderer(game, () => <SavedComp _resolve={resolve} />)
+								})
+							},
+							showTargetIsSaved({ game, targetPlayer }) {
+								return new Promise((resolve, reject) => {
 									setRenderer(game, () => <>?</>)
 								})
 							},
-							showTargetIsSaved({ game }) {
+							showBang({ game, message }) {
 								return new Promise((resolve, reject) => {
-									setRenderer(game, () => <>?</>)
+									setRenderer(game, () => (
+										<ShowBangComp _message={message} _resolve={resolve} />
+									))
 								})
 							},
 						},

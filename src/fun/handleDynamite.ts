@@ -13,7 +13,7 @@ import { GameContext } from './play'
 
 export async function handleDynamite(ctxt: GameContext) {
 	const { game, ui, player, nextPlayer } = ctxt
-	if (player.cardsPlayed.includes(Card.DYNAMITE)) {
+	if (player.cardsInPlay.includes(Card.DYNAMITE)) {
 		const color = pick(ColorValues)
 		const rank = pick(RankValues)
 		await ui.showDynamite({ game, color, rank })
@@ -24,13 +24,13 @@ export async function handleDynamite(ctxt: GameContext) {
 		if (itExplodes) {
 			await ui.showDynamiteExplodes({ game })
 			await handlePlayerDamage(ctxt, {
-				playerIndex: game.playerIndex,
+				player: player,
 				damage: DYNAMITE_DAMAGE,
 			})
 		} else {
 			await ui.showDynamiteDoesNotExplode({ game })
-			player.cardsPlayed.splice(player.cardsPlayed.indexOf(Card.DYNAMITE), 1)
-			nextPlayer.cardsPlayed.push(Card.DYNAMITE)
+			player.cardsInPlay.splice(player.cardsInPlay.indexOf(Card.DYNAMITE), 1)
+			nextPlayer.cardsInPlay.push(Card.DYNAMITE)
 			await ui.showNextPlayerGetsTheDynamite({ game, nextPlayer })
 		}
 	}

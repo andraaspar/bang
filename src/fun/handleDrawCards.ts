@@ -1,18 +1,19 @@
+import { IPlayer } from '../model/IPlayer'
 import { draw } from './draw'
 import { GameContext } from './play'
 
 export async function handleDrawCards(
 	ctxt: GameContext,
 	{
-		playerIndex,
+		player,
 		count,
 	}: {
-		playerIndex: number
+		player: IPlayer
 		count: number
 	},
 ) {
 	const { game, ui } = ctxt
-	const player = game.players[playerIndex]
+	const isYou = player === ctxt.player
 	for (let cardIndex = 0; cardIndex < count; cardIndex++) {
 		if (game.deck.length === 0) {
 			if (game.pile.length === 0) {
@@ -20,7 +21,13 @@ export async function handleDrawCards(
 			}
 			game.deck.push(...game.pile.splice(0, game.pile.length))
 		}
-		player.cardsInHand.push(draw(game.deck))
-		await ui.showCardDrawn({ game })
+		const card = draw(game.deck)
+		player.cardsInHand.push(card)
+		if (isYou) {
+			await ui.showCardDrawn({ game, card })
+		}
+	}
+	if (!isYou) {
+		await ui.showCardsDrawn({ game, player, count })
 	}
 }

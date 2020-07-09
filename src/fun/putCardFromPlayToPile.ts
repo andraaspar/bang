@@ -11,6 +11,6 @@ export function putCardFromPlayToPile(
 		cardIndex: number
 	},
 ) {
-	const card = player.cardsPlayed.splice(cardIndex, 1)[0]
+	const card = player.cardsInPlay.splice(cardIndex, 1)[0]
 	ctxt.game.pile.push(card)
 }

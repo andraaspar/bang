@@ -5,11 +5,15 @@ import {
 	BANG_SAVER_IN_PLAY,
 	BARREL_SAVE_COLOR,
 } from '../model/constants'
+import { IMessageBang } from '../model/message/IMessageBang'
+import { IMessageShowBarrel } from '../model/message/IMessageShowBarrel'
+import { MessageType } from '../model/message/MessageType'
 import { handlePlayerDamage } from './handlePlayerDamage'
 import { pick } from './pick'
 import { GameContext } from './play'
 import { putCardFromPlayToPile } from './putCardFromPlayToPile'
 import { putCardOnPile } from './putCardOnPile'
+import { withInterface } from './withInterface'
 
 export async function handleBang(
 	ctxt: GameContext,
@@ -22,18 +26,46 @@ export async function handleBang(
 		cardIndex,
 	})
 
-	const targetPlayerIndex = await ui.selectBangTarget({ game })
-	if (targetPlayerIndex == null) return
-	const targetPlayer = game.players[targetPlayerIndex]
+	const targetPlayer = await ui.selectBangTarget({
+		game,
+		targets: game.players.filter((aPlayer) => aPlayer !== player),
+	})
+	if (targetPlayer == null) return
 
-	if (targetPlayer.cardsPlayed.includes(Card.BARREL)) {
-		await ui.showBarrel({ game, targetPlayer })
+	for (const aPlayer of game.players) {
+		aPlayer.messages.push(
+			withInterface<IMessageBang>({
+				type: MessageType.Bang,
+				game,
+				player,
+				targetPlayer,
+				youAreThePlayer: aPlayer === player,
+				youAreTheTarget: aPlayer === targetPlayer,
+			}),
+		)
+	}
+
+	if (targetPlayer.cardsInPlay.includes(Card.BARREL)) {
+		for (const aPlayer of game.players) {
+			if (aPlayer === player || aPlayer === targetPlayer) {
+				aPlayer.messages.push(
+					withInterface<IMessageShowBarrel>({
+						type: MessageType.ShowBarrel,
+						game,
+						player,
+						targetPlayer,
+						youAreThePlayer: aPlayer === player,
+						youAreTheTarget: aPlayer === targetPlayer,
+					}),
+				)
+			}
+		}
 		const color = pick(ColorValues)
 		if (color === BARREL_SAVE_COLOR) {
 			await ui.showBarrelSave({ game, targetPlayer })
 			return
 		} else {
-			await ui.showBarrelFail({ game, targetPlayer })
+			await ui.showBarrelFail({ game, targetPlayer, color })
 		}
 	}
 
@@ -41,7 +73,7 @@ export async function handleBang(
 		targetPlayer.cardsInHand.includes(card),
 	)
 	const saversInPlay = BANG_SAVER_IN_PLAY.filter((card) =>
-		targetPlayer.cardsPlayed.includes(card),
+		targetPlayer.cardsInPlay.includes(card),
 	)
 	let saver: Card | null = null
 	if (saversInHand.length || saversInPlay.length) {
@@ -49,7 +81,9 @@ export async function handleBang(
 		await ui.showPlayerIsUp({ game, player: targetPlayer })
 		const action = await ui.selectSaveAction({
 			game,
-			targetPlayer,
+			player,
+			cardsInHand: targetPlayer.cardsInHand,
+			cardsInPlay: targetPlayer.cardsInPlay,
 		})
 		if (action) {
 			if (action.playCard) {
@@ -59,7 +93,7 @@ export async function handleBang(
 				await ui.showSaved({ game })
 			} else if (action.useCard) {
 				const cardIndex = action.useCard.cardIndex
-				saver = targetPlayer.cardsPlayed[cardIndex]
+				saver = targetPlayer.cardsInPlay[cardIndex]
 				putCardFromPlayToPile(ctxt, { cardIndex, player: targetPlayer })
 				await ui.showSaved({ game })
 			}
@@ -72,7 +106,7 @@ export async function handleBang(
 	}
 
 	await handlePlayerDamage(ctxt, {
-		playerIndex: targetPlayerIndex,
+		player: targetPlayer,
 		damage: 1,
 	})
 }
