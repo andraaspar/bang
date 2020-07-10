@@ -12,8 +12,8 @@ export function SelectBangTargetComp(props: SelectBangTargetCompProps) {
 	return (
 		<>
 			<h3 className={centeredCss}>Válassz célpontot!</h3>
-			{props._targets.map((target) => (
-				<div className={centeredCss}>
+			{props._targets.map((target, targetIndex) => (
+				<div key={targetIndex} className={centeredCss}>
 					<button onClick={() => props._resolve(target)}>{target.name}</button>
 				</div>
 			))}

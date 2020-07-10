@@ -104,6 +104,11 @@ export class GameContext {
 
 export async function play(p: IPlayArguments): Promise<IOutcome> {
 	const ctxt = new GameContext(p)
+
+	for (const player of ctxt.game.players) {
+		player.health = 4
+	}
+
 	while (true) {
 		const winners = ctxt.game.players.filter((player) => player.health >= 1)
 		if (winners.length <= 1) {

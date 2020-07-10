@@ -16,14 +16,14 @@ export function SelectActionComp(props: SelectActionCompProps) {
 		<>
 			<h3 className={centeredCss}>Mit teszel?</h3>
 			{props._cardsInHand.map((card, cardIndex) => (
-				<div className={centeredCss}>
+				<div key={cardIndex} className={centeredCss}>
 					<button onClick={() => props._resolve({ playCard: { cardIndex } })}>
 						{getCardName(card)}
 					</button>
 				</div>
 			))}
 			{props._cardsInPlay.map((card, cardIndex) => (
-				<div className={centeredCss}>
+				<div key={cardIndex} className={centeredCss}>
 					<button onClick={() => props._resolve({ useCard: { cardIndex } })}>
 						{getCardName(card)}
 					</button>

@@ -1,9 +1,11 @@
-import React, { ReactElement, useEffect, useState } from 'react'
+import { cloneDeep, isNumber, isObject, isString } from 'lodash'
+import React, { ReactElement, useContext, useEffect, useState } from 'react'
 import { Redirect, useHistory } from 'react-router-dom'
 import { play } from '../../fun/play'
 import { IGame } from '../../model/IGame'
 import { makeRouteWelcome } from '../../model/routing'
-import { AppStore } from '../../store/AppStore'
+import { centeredCss } from '../../style/centeredCss'
+import { GameContext } from '../context/GameContext'
 import { BarrelFailsComp } from '../gamepage/BarrelFailsComp'
 import { BarrelSavesComp } from '../gamepage/BarrelSavesComp'
 import { CanDrawComp } from '../gamepage/CanDrawComp'
@@ -30,8 +32,11 @@ export interface GamePageProps {}
 
 export function GamePage(props: GamePageProps) {
 	const history = useHistory()
-	const game = AppStore.useState((s) => s.game)
-	const [$initialGame] = useState(game)
+	const { game, setGame } = useContext(GameContext)
+	const [$initialGame, set$initialGame] = useState(game)
+	if (isObject(game) && $initialGame == null) {
+		set$initialGame(game)
+	}
 	const [$renderer, set$renderer] = useState<{
 		render: () => ReactElement
 	} | null>(null)
@@ -40,17 +45,15 @@ export function GamePage(props: GamePageProps) {
 
 		function setRenderer(game: IGame, render: () => ReactElement): void {
 			if (isAborted) return
-			AppStore.update((s) => {
-				s.game = JSON.parse(JSON.stringify(game))
-			})
+			setGame(cloneDeep(game))
 			set$renderer({ render })
 		}
 
 		;(async () => {
-			if ($initialGame) {
+			if (isObject($initialGame)) {
 				try {
 					const outcome = await play({
-						game: JSON.parse(JSON.stringify($initialGame)),
+						game: cloneDeep($initialGame),
 						ui: {
 							showPlayerIsUp({ game, player }) {
 								return new Promise((resolve, reject) => {
@@ -259,9 +262,18 @@ export function GamePage(props: GamePageProps) {
 		return () => {
 			isAborted = true
 		}
-	}, [$initialGame, history])
-	if (game == null) {
+	}, [setGame, $initialGame, history])
+	if (game === false) {
 		return <Redirect to={makeRouteWelcome()} />
+	} else if (isString(game)) {
+		return (
+			<div className={centeredCss} style={{ color: 'red' }}>
+				{game}
+			</div>
+		)
+	} else if (game == null || isNumber(game) || $renderer == null) {
+		return <div className={centeredCss}>...</div>
+	} else {
+		return $renderer.render()
 	}
-	return $renderer == null ? <>...</> : $renderer.render()
 }

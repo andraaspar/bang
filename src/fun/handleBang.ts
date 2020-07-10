@@ -8,12 +8,12 @@ import {
 import { IMessageBang } from '../model/message/IMessageBang'
 import { IMessageShowBarrel } from '../model/message/IMessageShowBarrel'
 import { MessageType } from '../model/message/MessageType'
+import { finalizeMessage } from './finalizeMessage'
 import { handlePlayerDamage } from './handlePlayerDamage'
 import { pick } from './pick'
 import { GameContext } from './play'
 import { putCardFromPlayToPile } from './putCardFromPlayToPile'
 import { putCardOnPile } from './putCardOnPile'
-import { withInterface } from './withInterface'
 
 export async function handleBang(
 	ctxt: GameContext,
@@ -34,7 +34,7 @@ export async function handleBang(
 
 	for (const aPlayer of game.players) {
 		aPlayer.messages.push(
-			withInterface<IMessageBang>({
+			finalizeMessage<IMessageBang>({
 				type: MessageType.Bang,
 				game,
 				player,
@@ -49,7 +49,7 @@ export async function handleBang(
 		for (const aPlayer of game.players) {
 			if (aPlayer === player || aPlayer === targetPlayer) {
 				aPlayer.messages.push(
-					withInterface<IMessageShowBarrel>({
+					finalizeMessage<IMessageShowBarrel>({
 						type: MessageType.ShowBarrel,
 						game,
 						player,

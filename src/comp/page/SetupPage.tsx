@@ -1,17 +1,18 @@
 import produce from 'immer'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { IGame, makeGame } from '../../model/IGame'
 import { makePlayer } from '../../model/IPlayer'
 import { IPlayerError } from '../../model/IPlayerError'
 import { makeRouteGame } from '../../model/routing'
-import { AppStore } from '../../store/AppStore'
 import { RED_5 } from '../../style/styleConstants'
+import { GameContext } from '../context/GameContext'
 import { RowComp } from '../RowComp'
 
 export interface SetupPageProps {}
 
 export function SetupPage(props: SetupPageProps) {
+	const { setGame } = useContext(GameContext)
 	const [$game, set$game] = useState<IGame>(makeGame)
 	const history = useHistory()
 	const playerErrors = $game.players.map(
@@ -28,7 +29,7 @@ export function SetupPage(props: SetupPageProps) {
 			<RowComp _isVertical _gap={10}>
 				<h3>Játékosok</h3>
 				{$game.players.map((player, playerIndex) => (
-					<div>
+					<div key={playerIndex}>
 						<RowComp _isVertical>
 							<input
 								value={player.name}
@@ -105,9 +106,7 @@ export function SetupPage(props: SetupPageProps) {
 						playerErrors.find((pe) => pe.hasError) != null
 					}
 					onClick={(e) => {
-						AppStore.update((s) => {
-							s.game = $game
-						})
+						setGame($game)
 						history.push(makeRouteGame())
 					}}
 				>
